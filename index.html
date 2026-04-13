@@ -195,6 +195,16 @@ function addFile() {
 
 }
 
+function showFinalMessage(){
+
+  const message = document.createElement("div");
+  message.className = "final-message";
+  message.innerHTML = "⬇️ Baje el scroll ⬇️";
+
+  document.body.appendChild(message);
+
+}
+
 // iniciar
 addFile();
 
