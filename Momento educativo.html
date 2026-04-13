@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    background: black;
+    font-family: 'Courier New', monospace;
+    padding: 20px;
+  }
+  .terminal {
+    background: #0a0e1a;
+    color: #00ff99;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    height: 300px;
+    overflow-y: hidden;
+    border: 1px solid #33ff99;
+    box-shadow: 0 0 20px rgba(0,255,150,0.2);
+  }
+  .transfer-area {
+    background: #0f1222;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    border: 1px solid #3366ff;
+  }
+  .message {
+    text-align: center;
+    color: #ffcc00;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-shadow: 0 0 5px #ff9900;
+    animation: pulse 1.5s infinite;
+  }
+  .files {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .file-row {
+    background: #1a1f2e;
+    padding: 8px 12px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    font-family: monospace;
+    color: #88ffaa;
+    border-left: 3px solid #00ff99;
+    animation: slideIn 0.5s ease-out;
+  }
+  .progress {
+    background: #2a2f3e;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 150px;
+  }
+  .progress-bar {
+    background: #00ff99;
+    width: 0%;
+    height: 100%;
+    transition: width 0.1s linear;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes pulse {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+  .terminal-line {
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typing 3s steps(40, end) infinite;
+  }
+  @keyframes typing {
+    0% { width: 0; }
+    50% { width: 100%; }
+    100% { width: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="terminal">
+  <div class="terminal-line">$> nc -lvp 4444</div>
+  <div class="terminal-line" style="animation-delay: 2s;">$> listening on [any] 4444 ...</div>
+  <div class="terminal-line" style="animation-delay: 4s;">$> connection from 192.168.1.105</div>
+  <div class="terminal-line" style="animation-delay: 6s;">$> receiving files...</div>
+</div>
+
+<div class="transfer-area">
+  <div class="message">⚠️ Transfiriendo archivos a un servidor remoto ⚠️</div>
+  <div class="files" id="fileList"></div>
+</div>
+
+<script>
+const fileNames = [
+  "Licitaciones_Previsora.sql","Nomina Funcionarios Previsora.xlsx","passwords.txt", "database_dump.sql", "config_backup.zip",
+  "system_keys.pem", "user_credentials.csv", "shadow_copy.bin",
+  "network_sniff.log", "ssh_keys.tar.gz", "browser_cookies.db"
+];
+const fileSizes = ["500.7 MB","39.0 MB", "10.2 MB", "43.7 MB", "20.9 MB", "22.3 MB", "51.1 MB", "33.4 MB", "30.6 MB", "8.2 MB", "19.8 MB"];
+let fileIndex = 0;
+
+function addFile() {
+  if (fileIndex >= fileNames.length) {
+    // Reiniciar animación
+    fileIndex = 0;
+    document.getElementById("fileList").innerHTML = "";
+  }
+  
+  const fileDiv = document.createElement("div");
+  fileDiv.className = "file-row";
+  const name = fileNames[fileIndex];
+  const size = fileSizes[fileIndex];
+  let progress = 0;
+  
+  fileDiv.innerHTML = `
+    <span>📁 ${name} (${size})</span>
+    <div class="progress"><div class="progress-bar" style="width:0%"></div></div>
+    <span id="percent-${fileIndex}">0%</span>
+  `;
+  
+  document.getElementById("fileList").appendChild(fileDiv);
+  
+	const bar = fileDiv.querySelector(".progress-bar");
+	const percentSpan = fileDiv.querySelector(`#percent-${fileIndex}`);
+
+	const interval = setInterval(() => {
+	  if (progress >= 100) {
+		clearInterval(interval);
+		setTimeout(() => addFile(), 800);
+	  } else {
+		progress += Math.random() * 15 + 5;
+		if (progress > 100) progress = 100;
+		bar.style.width = progress + "%";
+		percentSpan.innerText = Math.floor(progress) + "%";
+	  }
+	}, 150);
+  
+  fileIndex++;
+}
+
+addFile();
+setInterval(() => {
+  if (document.getElementById("fileList").children.length < 3) {
+    // Mantener entre 2-3 archivos visibles
+  }
+}, 500);
+</script>
+</body>
+</html>
