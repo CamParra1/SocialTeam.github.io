@@ -6,7 +6,9 @@
     background: black;
     font-family: 'Courier New', monospace;
     padding: 20px;
+    color: white;
   }
+
   .terminal {
     background: #0a0e1a;
     color: #00ff99;
@@ -18,6 +20,7 @@
     border: 1px solid #33ff99;
     box-shadow: 0 0 20px rgba(0,255,150,0.2);
   }
+
   .transfer-area {
     background: #0f1222;
     border-radius: 10px;
@@ -25,6 +28,7 @@
     margin-top: 20px;
     border: 1px solid #3366ff;
   }
+
   .message {
     text-align: center;
     color: #ffcc00;
@@ -34,11 +38,13 @@
     text-shadow: 0 0 5px #ff9900;
     animation: pulse 1.5s infinite;
   }
+
   .files {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
+
   .file-row {
     background: #1a1f2e;
     padding: 8px 12px;
@@ -50,41 +56,63 @@
     border-left: 3px solid #00ff99;
     animation: slideIn 0.5s ease-out;
   }
+
   .progress {
     background: #2a2f3e;
     border-radius: 10px;
     overflow: hidden;
     width: 150px;
   }
+
   .progress-bar {
     background: #00ff99;
     width: 0%;
     height: 100%;
     transition: width 0.1s linear;
   }
+
+  .final-message {
+    position: fixed;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 26px;
+    color: #00ffcc;
+    font-weight: bold;
+    animation: pulse 1.2s infinite;
+  }
+
   @keyframes slideIn {
     from { opacity: 0; transform: translateX(-30px); }
     to { opacity: 1; transform: translateX(0); }
   }
+
   @keyframes pulse {
     0% { opacity: 0.7; }
     100% { opacity: 1; }
   }
+
   .terminal-line {
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
     animation: typing 3s steps(40, end) infinite;
   }
+
   @keyframes typing {
     0% { width: 0; }
     50% { width: 100%; }
     100% { width: 0; }
   }
+
 </style>
 </head>
+
 <body>
-  
+
+<div id="mainContent">
+
 <div class="terminal">
   <div class="terminal-line">$> nc -lvp 4444</div>
   <div class="terminal-line" style="animation-delay: 2s;">$> listening on [any] 4444 ...</div>
@@ -97,36 +125,68 @@
   <div class="files" id="fileList"></div>
 </div>
 
+</div>
 
 <script>
+
 const fileNames = [
-  "Licitaciones_Previsora.sql","Nomina Funcionarios Previsora.xlsx","passwords.txt", 
-  "database_dump.sql", "config_backup.zip",
-  "system_keys.pem", "user_credentials.csv", "shadow_copy.bin",
-  "network_sniff.log", "ssh_keys.tar.gz", "browser_cookies.db"
+"Licitaciones_Previsora.sql",
+"Nomina Funcionarios Previsora.xlsx",
+"passwords.txt",
+"database_dump.sql",
+"config_backup.zip",
+"system_keys.pem",
+"user_credentials.csv",
+"shadow_copy.bin",
+"network_sniff.log",
+"ssh_keys.tar.gz",
+"browser_cookies.db"
 ];
 
 const fileSizes = [
-  "500.7 MB","39.0 MB","10.2 MB","43.7 MB","20.9 MB",
-  "22.3 MB","51.1 MB","33.4 MB","30.6 MB","8.2 MB","19.8 MB"
+"500.7 MB","39.0 MB","10.2 MB","43.7 MB","20.9 MB",
+"22.3 MB","51.1 MB","33.4 MB","30.6 MB","8.2 MB","19.8 MB"
 ];
 
 let fileIndex = 0;
 
+function showFinalMessage(){
+
+  document.getElementById("mainContent").innerHTML = "";
+
+  const finalDiv = document.createElement("div");
+  finalDiv.className = "final-message";
+
+  finalDiv.innerHTML = `
+  ⚠️ Esta fue una campaña de concientización de seguridad ⚠️ <br><br>
+  La información corporativa es sensible. <br>
+  Evite compartir archivos sin autorización.
+  `;
+
+  document.body.appendChild(finalDiv);
+}
+
+
 function addFile() {
+
+  if(fileIndex >= fileNames.length){
+
+    setTimeout(showFinalMessage,1500);
+    return;
+  }
 
   const fileDiv = document.createElement("div");
   fileDiv.className = "file-row";
 
-  const name = fileNames[fileIndex % fileNames.length];
-  const size = fileSizes[fileIndex % fileSizes.length];
+  const name = fileNames[fileIndex];
+  const size = fileSizes[fileIndex];
 
   let progress = 0;
 
   fileDiv.innerHTML = `
     <span>📁 ${name} (${size})</span>
     <div class="progress">
-      <div class="progress-bar" style="width:0%"></div>
+      <div class="progress-bar"></div>
     </div>
     <span class="percent">0%</span>
   `;
@@ -142,11 +202,7 @@ function addFile() {
     if (progress >= 100) {
 
       clearInterval(interval);
-
-      // eliminar archivos antiguos si hay más de 4
-      if (fileList.children.length > 5) {
-        fileList.removeChild(fileList.firstChild);
-      }
+      fileIndex++;
 
       setTimeout(addFile, 600);
 
@@ -161,12 +217,12 @@ function addFile() {
 
   }, 150);
 
-  fileIndex++;
 }
 
-// Iniciar animación
+// iniciar
 addFile();
 
 </script>
+
 </body>
 </html>
